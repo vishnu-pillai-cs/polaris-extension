@@ -1,0 +1,44 @@
+{
+  "name": "polaris-extension",
+  "displayName": "Polaris",
+  "version": "0.0.1",
+  "description": "A virtual co-worker helping you get more done",
+  "author": "Your Name",
+  "scripts": {
+    "dev": "plasmo dev",
+    "build": "plasmo build",
+    "package": "plasmo package"
+  },
+  "dependencies": {
+    "lucide-react": "^0.554.0",
+    "plasmo": "^0.90.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.268",
+    "@types/node": "^22.10.5",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "autoprefixer": "^10.4.22",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "postcss": "^8.5.6",
+    "sharp": "^0.34.5",
+    "tailwind-merge": "^3.4.0",
+    "tailwindcss": "^3.4.15",
+    "typescript": "^5.7.3"
+  },
+  "manifest": {
+    "host_permissions": [
+      "<all_urls>"
+    ],
+    "permissions": [
+      "cookies",
+      "activeTab",
+      "sidePanel",
+      "tabs",
+      "scripting"
+    ]
+  }
+}
