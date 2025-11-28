@@ -12,7 +12,10 @@ type EventType =
   | 'tool-result' 
   | 'chunk-table' 
   | 'chunk-code' 
-  | 'chunk-chart';
+  | 'chunk-chart'
+  | 'chunk-entry'
+  | 'chunk-content-type'
+  | 'chunk-asset';
 
 interface StreamEvent {
   type: EventType;
@@ -124,15 +127,21 @@ const ContentChunkComponent: React.FC<ContentChunkProps> = React.memo(({
     }
     
     // Structured chunks: render with shadcn components
-    if (eventType === 'chunk-table') {
+    if (eventType === 'chunk-table' || eventType === 'chunk-entry' || eventType === 'chunk-content-type' || eventType === 'chunk-asset') {
       const tableData = structuredContent || {};
       const hasData = tableData.headers && tableData.rows;
+      
+      // Determine icon based on type
+      let icon = '📊';
+      if (eventType === 'chunk-entry') icon = '📄';
+      if (eventType === 'chunk-content-type') icon = '📋';
+      if (eventType === 'chunk-asset') icon = '🖼️';
       
       return (
         <Card className="my-2 overflow-hidden border border-gray-300 shadow-sm">
           {tableData.title && (
             <CardHeader className="py-2.5 px-3 bg-gray-50 border-b border-gray-300">
-              <CardTitle className="text-xs font-semibold text-gray-800">📊 {tableData.title}</CardTitle>
+              <CardTitle className="text-xs font-semibold text-gray-800">{icon} {tableData.title}</CardTitle>
             </CardHeader>
           )}
           <CardContent className="p-0">
@@ -304,9 +313,9 @@ const ToolCallComponent: React.FC<ToolCallComponentProps> = React.memo(({
   autoExpand, 
   autoCollapse 
 }) => {
+  const hasChildAgent = Boolean(toolCall.childAgent);
   const [isExpanded, setIsExpanded] = useState(true);
   const [isResultExpanded, setIsResultExpanded] = useState(false);
-  const hasChildAgent = Boolean(toolCall.childAgent);
   
   // Dynamic indentation based on depth - each level adds more indentation
   const baseIndent = 20; // base pixels for first level
@@ -331,7 +340,7 @@ const ToolCallComponent: React.FC<ToolCallComponentProps> = React.memo(({
         
         <Wrench className="w-3 h-3 flex-shrink-0" style={{ color: '#6c5ce7' }} />
         <span className="font-bold text-sm leading-none" style={{ color: '#6c5ce7' }}>
-          {toolCall.toolName.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
+          {toolCall.toolName}
         </span>
       </div>
       
@@ -440,11 +449,14 @@ const ExecutionNodeComponent: React.FC<ExecutionNodeProps> = React.memo(({
            e.type === 'chunk-sub-agent-text' || 
            e.type === 'chunk-table' || 
            e.type === 'chunk-code' ||
+           e.type === 'chunk-entry' ||
+           e.type === 'chunk-content-type' ||
+           e.type === 'chunk-asset' ||
            e.type === 'chunk-chart') && e.payload?.messageId) {
         
         const msgId = e.payload.messageId;
         const isTextChunk = e.type === 'chunk-text' || e.type === 'chunk-sub-agent-text';
-        const isStructuredChunk = e.type === 'chunk-table' || e.type === 'chunk-code' || e.type === 'chunk-chart';
+        const isStructuredChunk = e.type === 'chunk-table' || e.type === 'chunk-code' || e.type === 'chunk-chart' || e.type === 'chunk-entry' || e.type === 'chunk-content-type' || e.type === 'chunk-asset';
         
         if (!messageMap.has(msgId)) {
           // Create new message entry
@@ -723,6 +735,10 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({
           autoCollapse={true}
         />
       ))}
+      
+      {isStreaming && (
+        <span className="streaming-cursor">▋</span>
+      )}
     </div>
   );
 };

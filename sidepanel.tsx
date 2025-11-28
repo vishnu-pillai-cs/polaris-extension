@@ -19,7 +19,10 @@ type EventType =
   | 'tool-result' 
   | 'chunk-table' 
   | 'chunk-code' 
-  | 'chunk-chart';
+  | 'chunk-chart'
+  | 'chunk-entry'
+  | 'chunk-content-type'
+  | 'chunk-asset';
 
 interface StreamEvent {
   type: EventType;
@@ -335,10 +338,14 @@ function SidePanel() {
                   )}
                   <div className="message-text">
                     {msg.role === "assistant" ? (
-                      <AssistantMessage 
-                        event={msg.currentEvent || null}
-                        isStreaming={msg.isStreaming}
-                      />
+                      msg.content ? (
+                        <div className="text-red-600 font-medium whitespace-pre-wrap">{msg.content}</div>
+                      ) : (
+                        <AssistantMessage 
+                          event={msg.currentEvent || null}
+                          isStreaming={msg.isStreaming}
+                        />
+                      )
                     ) : (
                       <span className="text-white">{msg.content}</span>
                     )}
